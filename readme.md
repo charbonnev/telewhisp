@@ -1,0 +1,1 @@
+# Telewhisp: Receives audio, transcribes it and structures it in tasks
