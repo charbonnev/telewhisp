@@ -9,7 +9,6 @@ Create a .env file with:
 
 Run it with python3 main.py
 
-Next steps:
 You must install whisper:
 
 ```
