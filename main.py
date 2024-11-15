@@ -6,18 +6,23 @@ the Application and registered at their respective places.
 Then, the bot is started and runs until we press Ctrl-C on the command line.
 
 Usage:
-Basic Echobot example, repeats messages.
+Send the bot an audio, it will reply with the transcription.
 Press Ctrl-C on the command line or send a signal to the process to stop the
 bot.
 """
+import whisper
+from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
+from telegram import ForceReply, Update
+import logging
 import os
 from dotenv import load_dotenv
 load_dotenv()
 TOKEN = os.getenv("TOKEN")
-import logging
 
-from telegram import ForceReply, Update
-from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
+
+# Load the Whisper model
+# Choose "tiny", "base", "small", "medium", or "large"
+model = whisper.load_model("medium")
 
 # Enable logging
 logging.basicConfig(
@@ -48,12 +53,16 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Echo the user message."""
     await update.message.reply_text(update.message.text)
-    
+
+
 async def echo_voice(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Save the voice message to the current folder and Echo the user voice message."""    
+    """Save the voice message to the current folder and Echo the user voice message."""
     voice_file = await update.message.voice.get_file()
-    await voice_file.download_to_drive(f"{voice_file.file_id}.ogg")
-    await update.message.reply_text("salvo")
+    audio_path = f"{voice_file.file_id}.ogg"
+    await voice_file.download_to_drive(audio_path)
+    # Transcribe the audio
+    result = model.transcribe(audio_path)
+    await update.message.reply_text(result["text"])
 
 
 def main() -> None:
@@ -66,8 +75,9 @@ def main() -> None:
     application.add_handler(CommandHandler("help", help_command))
 
     # on non command i.e message - echo the message on Telegram
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
-    
+    application.add_handler(MessageHandler(
+        filters.TEXT & ~filters.COMMAND, echo))
+
     # on receiving a voice message, send it back
     application.add_handler(MessageHandler(filters.VOICE, echo_voice))
 
