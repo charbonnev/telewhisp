@@ -1,7 +1,5 @@
 # Telewhisp: Receives audio, transcribes it and sends them back through telegram
 
-In progress!
-
 ![Demo](assets/demo.gif)
 
 ## Prepation:
