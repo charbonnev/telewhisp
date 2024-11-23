@@ -38,3 +38,5 @@ sudo apt update && sudo apt install ffmpeg
 ```
 
 If you need additional help for manual installation, please refer to this: [Whisper Github](https://github.com/openai/whisper).
+
+If you like it, leave a start!
